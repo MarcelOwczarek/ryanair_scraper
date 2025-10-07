@@ -1,0 +1,29 @@
+name: Rynair Data Scraper
+
+on:
+  schedule:
+    - cron: '0 */2 * * *' # co 2h
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run scraper
+        run: python script.py
+      - name: Commit CSV
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add ryanair_nov_full_async.csv
+          git commit -m "Update CSV" || echo "No changes"
+          git push https://x-access-token:${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}@github.com/${{ github.repository }}.git
