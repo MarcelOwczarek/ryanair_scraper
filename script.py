@@ -131,8 +131,8 @@ async def worker_task(sema, session, origin, dest, out_date, in_date, proxy=None
 async def main():
     
     with open(OUTPUT_CSV, "w", newline="", encoding="utf-8") as f:
-    writer = csv.DictWriter(f, fieldnames=CSV_HEADERS)
-    writer.writeheader()
+        writer = csv.DictWriter(f, fieldnames=CSV_HEADERS)
+        writer.writeheader()
     
     out_dates = list(daterange(START_DATE, END_DATE))
     connector = aiohttp.TCPConnector(limit_per_host=CONCURRENCY)
@@ -156,4 +156,5 @@ if __name__ == "__main__":
     t0 = time.time()
     asyncio.run(main())
     print("Koniec. Czas:", time.time() - t0, "s")
+
 
