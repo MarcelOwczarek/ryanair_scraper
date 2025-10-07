@@ -1,4 +1,0 @@
-aiohttp
-async-timeout
-pandas
-tqdm
