@@ -52,11 +52,8 @@ def make_link(origin, dest, out_date, in_date):
     )
 
 def write_row_csv(row):
-    exists = os.path.exists(OUTPUT_CSV)
     with open(OUTPUT_CSV, "a", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_HEADERS)
-        if not exists:
-            writer.writeheader()
         writer.writerow(row)
 
 async def fetch_farfnd(session, origin, dest, out_date, in_date, proxy=None):
@@ -132,6 +129,11 @@ async def worker_task(sema, session, origin, dest, out_date, in_date, proxy=None
         return None
 
 async def main():
+    
+    with open(OUTPUT_CSV, "w", newline="", encoding="utf-8") as f:
+    writer = csv.DictWriter(f, fieldnames=CSV_HEADERS)
+    writer.writeheader()
+    
     out_dates = list(daterange(START_DATE, END_DATE))
     connector = aiohttp.TCPConnector(limit_per_host=CONCURRENCY)
     timeout = aiohttp.ClientTimeout(total=REQUEST_TIMEOUT+5)
@@ -154,3 +156,4 @@ if __name__ == "__main__":
     t0 = time.time()
     asyncio.run(main())
     print("Koniec. Czas:", time.time() - t0, "s")
+
