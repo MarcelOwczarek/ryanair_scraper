@@ -25,4 +25,4 @@ jobs:
           branch: main
           file_pattern: ryanair_nov_full_async.csv
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.tokengłupi }}
