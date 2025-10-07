@@ -26,4 +26,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add ryanair_nov_full_async.csv
           git commit -m "Update CSV" || echo "No changes"
-          git push https://x-access-token:${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}@github.com/${{ github.repository }}.git
+          git push https://x-access-token:$GH_TOKEN@github.com/${{ github.repository }}.git
