@@ -16,7 +16,7 @@ END_DATE = date(2025, 12, 31)
 ORIGINS = {"LCJ": "Łódź", "WMI": "Warszawa Modlin", "WAW": "Warszawa Chopin", "KTW": "Katowice", "KRK": "Kraków", "POZ": "Poznań"}
 DESTINATIONS = {
     "STN": "London Stansted", "EDI": "Edinburgh", "AGP": "Malaga", "ALC": "Alicante",
-    "CDG": "Paryż", "ATH": "Ateny", "BGY": "Bergamo", "LTN": "London Luton", "BCN": "Barcelona", "TFS": "Tenerife South", "BVA": "Paryż Beauvais", "DBV": "Chorwacja Dubrovnik",
+    "CDG": "Paryż", "ATH": "Ateny", "BGY": "Bergamo", "LTN": "London Luton", "BCN": "Barcelona", "TFS": "Teneryfa Południe", "BVA": "Paryż Beauvais", "DBV": "Chorwacja Dubrovnik",
 }
 
 ADULTS = 1
@@ -156,6 +156,7 @@ if __name__ == "__main__":
     t0 = time.time()
     asyncio.run(main())
     print("Koniec. Czas:", time.time() - t0, "s")
+
 
 
 
