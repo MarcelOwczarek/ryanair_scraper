@@ -11,7 +11,7 @@ import os
 
 # --- KONFIG ---
 START_DATE = date(2025, 11, 1)
-END_DATE = date(2026, 01, 31)
+END_DATE = date(2026, 1, 31)
 
 ORIGINS = {"LCJ": "Łódź", "WMI": "Warszawa Modlin", "WAW": "Warszawa Chopin", "KTW": "Katowice", "KRK": "Kraków", "POZ": "Poznań"}
 DESTINATIONS = {
@@ -156,6 +156,7 @@ if __name__ == "__main__":
     t0 = time.time()
     asyncio.run(main())
     print("Koniec. Czas:", time.time() - t0, "s")
+
 
 
 
