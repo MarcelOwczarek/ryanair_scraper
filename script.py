@@ -10,8 +10,8 @@ import csv
 import os
 
 # --- KONFIG ---
-START_DATE = date(2025, 11, 1)
-END_DATE = date(2026, 1, 31)
+START_DATE = date(2026, 1, 1)
+END_DATE = date(2026, 5, 31)
 
 ORIGINS = {"LCJ": "Łódź", "WMI": "Warszawa Modlin", "WAW": "Warszawa Chopin", "KTW": "Katowice", "KRK": "Kraków", "POZ": "Poznań"}
 DESTINATIONS = {
@@ -25,7 +25,7 @@ MARKET = "pl-pl"
 
 CONCURRENCY = 8
 REQUEST_TIMEOUT = 20
-MAX_RETRIES = 3
+MAX_RETRIES = 6
 BACKOFF_BASE = 1.5
 
 OUTPUT_CSV = 'ryanair_nov_full_async.csv'
@@ -156,6 +156,7 @@ if __name__ == "__main__":
     t0 = time.time()
     asyncio.run(main())
     print("Koniec. Czas:", time.time() - t0, "s")
+
 
 
 
