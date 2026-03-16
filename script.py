@@ -13,10 +13,143 @@ import os
 START_DATE = date(2026, 1, 1)
 END_DATE = date(2026, 5, 31)
 
-ORIGINS = {"LCJ": "Łódź", "WMI": "Warszawa Modlin", "WAW": "Warszawa Chopin", "KTW": "Katowice", "KRK": "Kraków", "POZ": "Poznań"}
+ORIGINS = {
+    "LCJ": "Łódź",
+    "WMI": "Warszawa Modlin",
+    "WAW": "Warszawa Chopin",
+    "KTW": "Katowice",
+    "KRK": "Kraków",
+    "POZ": "Poznań"
+}
+
 DESTINATIONS = {
-    "STN": "London Stansted", "EDI": "Edinburgh", "AGP": "Malaga", "ALC": "Alicante",
-    "CDG": "Paryż", "ATH": "Ateny", "BGY": "Bergamo", "LTN": "London Luton", "BCN": "Barcelona", "TFS": "Teneryfa Południe", "BVA": "Paryż Beauvais", "DBV": "Chorwacja Dubrovnik", "MLA": "Malta",
+
+    # Wielka Brytania
+    "STN": "London Stansted",
+    "LTN": "London Luton",
+    "MAN": "Manchester",
+    "LPL": "Liverpool",
+    "BHX": "Birmingham",
+    "BRS": "Bristol",
+    "LBA": "Leeds Bradford",
+    "NCL": "Newcastle",
+    "EDI": "Edinburgh",
+
+    # Irlandia
+    "DUB": "Dublin",
+    "ORK": "Cork",
+    "SNN": "Shannon",
+
+    # Hiszpania
+    "BCN": "Barcelona",
+    "MAD": "Madryt",
+    "AGP": "Malaga",
+    "ALC": "Alicante",
+    "VLC": "Walencja",
+    "SVQ": "Sewilla",
+    "GRO": "Girona",
+    "PMI": "Palma de Mallorca",
+    "IBZ": "Ibiza",
+    "TFS": "Teneryfa Południe",
+
+    # Włochy
+    "BGY": "Bergamo",
+    "FCO": "Rzym Fiumicino",
+    "CIA": "Rzym Ciampino",
+    "PSA": "Piza",
+    "BLQ": "Bolonia",
+    "NAP": "Neapol",
+    "BRI": "Bari",
+    "PMO": "Palermo",
+    "CAG": "Cagliari",
+    "SUF": "Lamezia Terme",
+
+    # Portugalia
+    "LIS": "Lizbona",
+    "OPO": "Porto",
+    "FAO": "Faro",
+    "FNC": "Funchal Madera",
+
+    # Francja
+    "BVA": "Paryż Beauvais",
+    "MRS": "Marsylia",
+    "TLS": "Tuluza",
+
+    # Belgia
+    "CRL": "Bruksela Charleroi",
+
+    # Holandia
+    "EIN": "Eindhoven",
+
+    # Niemcy
+    "BER": "Berlin",
+    "DTM": "Dortmund",
+    "NRN": "Dusseldorf Weeze",
+    "HHN": "Frankfurt Hahn",
+    "FMM": "Memmingen",
+
+    # Szwecja
+    "ARN": "Sztokholm Arlanda",
+    "GOT": "Göteborg",
+
+    # Norwegia
+    "TRF": "Oslo Torp",
+
+    # Dania
+    "CPH": "Kopenhaga",
+
+    # Finlandia
+    "HEL": "Helsinki",
+
+    # Grecja
+    "ATH": "Ateny",
+    "SKG": "Saloniki",
+    "CFU": "Korfu",
+    "RHO": "Rodos",
+    "CHQ": "Chania",
+
+    # Cypr
+    "PFO": "Pafos",
+
+    # Malta
+    "MLA": "Malta",
+
+    # Chorwacja
+    "DBV": "Dubrownik",
+    "SPU": "Split",
+    "ZAD": "Zadar",
+
+    # Czarnogóra
+    "TGD": "Podgorica",
+
+    # Albania
+    "TIA": "Tirana",
+
+    # Bułgaria
+    "SOF": "Sofia",
+
+    # Rumunia
+    "OTP": "Bukareszt",
+
+    # Węgry
+    "BUD": "Budapeszt",
+
+    # Słowacja
+    "BTS": "Bratysława",
+
+    # Czechy
+    "PRG": "Praga",
+
+    # Kraje bałtyckie
+    "VNO": "Wilno",
+    "RIX": "Ryga",
+    "TLL": "Tallin",
+
+    # Maroko
+    "RAK": "Marrakesz",
+
+    # Jordania
+    "AMM": "Amman",
 }
 
 ADULTS = 1
