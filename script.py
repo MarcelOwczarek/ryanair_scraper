@@ -158,7 +158,7 @@ REQUEST_TIMEOUT = 20
 MAX_RETRIES = 6
 BACKOFF_BASE = 1.5
 
-OUTPUT_CSV = 'flights_full_async.csv'
+OUTPUT_CSV = 'ryanair_nov_full_async.csv'
 CSV_HEADERS = ["origin_iata","origin_city","destination_iata","destination_city",
                "outbound_date","inbound_date","total_price","link"]
 
