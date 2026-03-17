@@ -227,24 +227,26 @@ async def main():
 
     sema=asyncio.Semaphore(CONCURRENCY)
 
-    combos=[
+    combos = [
 
-        (origin,dest,out_date,out_date+timedelta(days=delta))
+    (origin, dest, out_date, out_date + timedelta(days=delta))
 
-        for origin,dest in product(ORIGINS.keys(),DESTINATIONS.keys())
+    for origin, dest in product(ORIGINS.keys(), DESTINATIONS.keys())
 
-        for out_date in out_dates
+    for out_date in out_dates
 
-        for delta in range(1,4)
+    for delta in (
+        range(1,9) if origin in LONDON_AIRPORTS
+        else range(1,4)
+    )
 
-        if out_date+timedelta(days=delta)<=END_DATE
+    if out_date + timedelta(days=delta) <= END_DATE
 
-        # wyjątek londyn
-        and not (
-            origin in LONDON_AIRPORTS
-            and dest not in LONDON_ALLOWED_DEST
-        )
-    ]
+    and not (
+        origin in LONDON_AIRPORTS
+        and dest not in LONDON_ALLOWED_DEST
+    )
+]
 
     print("Kombinacji:",len(combos))
 
