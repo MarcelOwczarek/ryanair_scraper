@@ -11,7 +11,7 @@ import os
 
 # --- KONFIG ---
 START_DATE = date(2026, 3, 16)
-END_DATE = date(2026, 6, 30)
+END_DATE = date(2026, 8, 31)
 
 
 ORIGINS = {
