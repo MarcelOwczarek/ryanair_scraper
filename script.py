@@ -55,7 +55,6 @@ DESTINATIONS = {
     "LIS": "Lizbona",
     "OPO": "Porto",
     "FAO": "Faro",
-    "FNC": "Funchal Madera",
 
     "BVA": "Paryż Beauvais",
     "MRS": "Marsylia",
