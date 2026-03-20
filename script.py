@@ -8,11 +8,11 @@ from tqdm import tqdm
 import time
 import csv
 import os
+import random  # 🔥 DODANE
 
 # --- KONFIG ---
 START_DATE = date(2026, 3, 16)
 END_DATE = date(2026, 8, 31)
-
 
 ORIGINS = {
     "LCJ": "Łódź",
@@ -24,12 +24,9 @@ ORIGINS = {
 }
 
 DESTINATIONS = {
-    # Wielka Brytania
     "STN": "London Stansted",
     "LTN": "London Luton",
     "EDI": "Edinburgh",
-
-    # Hiszpania
     "BCN": "Barcelona",
     "MAD": "Madryt",
     "AGP": "Malaga",
@@ -40,8 +37,6 @@ DESTINATIONS = {
     "PMI": "Palma de Mallorca",
     "IBZ": "Ibiza",
     "TFS": "Teneryfa Południe",
-
-    # Włochy
     "BGY": "Bergamo",
     "FCO": "Rzym Fiumicino",
     "CIA": "Rzym Ciampino",
@@ -52,32 +47,20 @@ DESTINATIONS = {
     "PMO": "Palermo",
     "CAG": "Cagliari",
     "SUF": "Lamezia Terme",
-
-    # Portugalia
     "LIS": "Lizbona",
     "OPO": "Porto",
     "FAO": "Faro",
-
-    # Francja
     "BVA": "Paryż Beauvais",
     "MRS": "Marsylia",
-
-    # Grecja
     "ATH": "Ateny",
     "SKG": "Saloniki",
     "CFU": "Korfu",
     "RHO": "Rodos",
     "CHQ": "Chania",
-
-    # Cypr
     "PFO": "Pafos",
-
-    # Chorwacja
     "DBV": "Dubrownik",
     "SPU": "Split",
     "ZAD": "Zadar",
-
-    # Czarnogóra
     "TGD": "Podgorica",
 }
 
@@ -85,10 +68,11 @@ ADULTS = 1
 LANG = "pl-pl"
 MARKET = "pl-pl"
 
-CONCURRENCY = 8
+CONCURRENCY = 3  # 🔥 MNIEJ
 REQUEST_TIMEOUT = 20
 MAX_RETRIES = 6
 BACKOFF_BASE = 1.5
+BATCH_SIZE = 200  # 🔥 NOWE
 
 OUTPUT_CSV = 'ryanair_nov_full_async.csv'
 CSV_HEADERS = ["origin_iata","origin_city","destination_iata","destination_city",
@@ -173,6 +157,9 @@ async def fetch_farfnd(session, origin, dest, out_date, in_date, proxy=None):
 
 async def worker_task(sema, session, origin, dest, out_date, in_date, proxy=None):
     async with sema:
+
+        await asyncio.sleep(random.uniform(0.5, 1.2))  # 🔥 KLUCZ
+
         result = await fetch_farfnd(session, origin, dest, out_date, in_date, proxy)
         if result:
             link = make_link(origin, dest, out_date, in_date)
@@ -200,6 +187,7 @@ async def main():
     connector = aiohttp.TCPConnector(limit_per_host=CONCURRENCY)
     timeout = aiohttp.ClientTimeout(total=REQUEST_TIMEOUT+5)
     sema = asyncio.Semaphore(CONCURRENCY)
+
     combos = [
         (origin, dest, out_date, out_date + timedelta(days=delta))
         for origin, dest in product(ORIGINS.keys(), DESTINATIONS.keys())
@@ -207,12 +195,21 @@ async def main():
         for delta in range(1,4)
         if out_date + timedelta(days=delta) <= END_DATE
     ]
-    print(f"Łącznie kombinacji do sprawdzenia: {len(combos)}")
+
+    print(f"Łącznie kombinacji: {len(combos)}")
 
     async with aiohttp.ClientSession(connector=connector, timeout=timeout) as session:
-        tasks = [worker_task(sema, session, o, d, od, id) for o,d,od,id in combos]
-        for f in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="scraping"):
-            await f
+
+        for i in range(0, len(combos), BATCH_SIZE):
+            batch = combos[i:i+BATCH_SIZE]
+
+            tasks = [
+                worker_task(sema, session, o, d, od, id)
+                for o,d,od,id in batch
+            ]
+
+            for f in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc=f"batch {i//BATCH_SIZE+1}"):
+                await f
 
 if __name__ == "__main__":
     t0 = time.time()
