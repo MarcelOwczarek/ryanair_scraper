@@ -32,6 +32,7 @@ DESTINATIONS = {
     
     # Francja
     "BVA": "Paryż Beauvais",
+    "NCE": "Nicea",
     
     # Grecja
     "ATH": "Ateny",
