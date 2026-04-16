@@ -10,13 +10,48 @@ import csv
 import os
 
 # --- KONFIG ---
-START_DATE = date(2025, 11, 1)
-END_DATE = date(2025, 11, 30)
+START_DATE = date(2026, 4, 16)
+END_DATE = date(2026, 12, 31)
 
-ORIGINS = {"LCJ": "Łódź", "WMI": "Warszawa Modlin", "WAW": "Warszawa Chopin", "KTW": "Katowice"}
+ORIGINS = {
+    "LCJ": "Łódź",
+    "WMI": "Warszawa Modlin",
+    "WAW": "Warszawa Chopin",
+    "KTW": "Katowice",
+    "KRK": "Kraków",
+    "POZ": "Poznań"
+}
+
 DESTINATIONS = {
-    "STN": "London Stansted", "EDI": "Edinburgh", "AGP": "Malaga", "ALC": "Alicante",
-    "CDG": "Paryż", "ATH": "Ateny", "BGY": "Bergamo", "OPO": "Porto"
+    # Wielka Brytania
+    "STN": "London Stansted",
+    "LTN": "London Luton",
+    "EDI": "Edinburgh",
+
+    # Hiszpania
+    "AGP": "Malaga",
+    "SVQ": "Sewilla",
+    "PMI": "Palma de Mallorca",
+    "TFS": "Teneryfa Południe",
+
+    # Włochy
+    "BGY": "Bergamo",
+    "FCO": "Rzym Fiumicino",
+    "CIA": "Rzym Ciampino",
+    "NAP": "Neapol",
+
+    # Francja
+    "BVA": "Paryż Beauvais",
+
+    # Grecja
+    "ATH": "Ateny",
+    "CHQ": "Chania",
+
+    # Chorwacja
+    "DBV": "Dubrownik",
+
+    # Czarnogóra
+    "TGD": "Podgorica",  
 }
 
 ADULTS = 1
