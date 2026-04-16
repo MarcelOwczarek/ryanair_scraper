@@ -1,13 +1,10 @@
 import asyncio
 import aiohttp
 import async_timeout
-import pandas as pd
 from datetime import date, timedelta
 from itertools import product
-from tqdm import tqdm
 import time
 import csv
-import os
 
 # --- KONFIG ---
 START_DATE = date(2026, 4, 16)
@@ -23,35 +20,22 @@ ORIGINS = {
 }
 
 DESTINATIONS = {
-    # Wielka Brytania
     "STN": "London Stansted",
     "LTN": "London Luton",
     "EDI": "Edinburgh",
-
-    # Hiszpania
     "AGP": "Malaga",
     "SVQ": "Sewilla",
     "PMI": "Palma de Mallorca",
     "TFS": "Teneryfa Południe",
-
-    # Włochy
     "BGY": "Bergamo",
     "FCO": "Rzym Fiumicino",
     "CIA": "Rzym Ciampino",
     "NAP": "Neapol",
-
-    # Francja
     "BVA": "Paryż Beauvais",
-
-    # Grecja
     "ATH": "Ateny",
     "CHQ": "Chania",
-
-    # Chorwacja
     "DBV": "Dubrownik",
-
-    # Czarnogóra
-    "TGD": "Podgorica",  
+    "TGD": "Podgorica",
 }
 
 ADULTS = 1
@@ -63,9 +47,11 @@ REQUEST_TIMEOUT = 20
 MAX_RETRIES = 3
 BACKOFF_BASE = 1.5
 
-OUTPUT_CSV = 'ryanair_nov_full_async.csv'
-CSV_HEADERS = ["origin_iata","origin_city","destination_iata","destination_city",
-               "outbound_date","inbound_date","total_price","link"]
+OUTPUT_CSV = 'ryanair_async.csv'
+CSV_HEADERS = [
+    "origin_iata","origin_city","destination_iata","destination_city",
+    "outbound_date","inbound_date","total_price","link"
+]
 
 # --- FUNKCJE ---
 def daterange(start_date, end_date):
@@ -79,11 +65,8 @@ def make_link(origin, dest, out_date, in_date):
         f"https://www.ryanair.com/pl/pl/trip/flights/select?"
         f"adults={ADULTS}&teens=0&children=0&infants=0"
         f"&dateOut={out_date.isoformat()}&dateIn={in_date.isoformat()}"
-        f"&isConnectedFlight=false&discount=0&promoCode=&isReturn=true"
+        f"&isReturn=true"
         f"&originIata={origin}&destinationIata={dest}"
-        f"&tpAdults={ADULTS}&tpTeens=0&tpChildren=0&tpInfants=0"
-        f"&tpStartDate={out_date.isoformat()}&tpEndDate={in_date.isoformat()}"
-        f"&tpDiscount=0&tpPromoCode=&tpOriginIata={origin}&tpDestinationIata={dest}"
     )
 
 def write_row_csv(row):
@@ -91,7 +74,7 @@ def write_row_csv(row):
         writer = csv.DictWriter(f, fieldnames=CSV_HEADERS)
         writer.writerow(row)
 
-async def fetch_farfnd(session, origin, dest, out_date, in_date, proxy=None):
+async def fetch_farfnd(session, origin, dest, out_date, in_date):
     url = "https://services-api.ryanair.com/farfnd/3/roundTripFares"
     params = {
         "departureAirportIataCode": origin,
@@ -104,73 +87,77 @@ async def fetch_farfnd(session, origin, dest, out_date, in_date, proxy=None):
         "market": MARKET,
         "limit": 10
     }
-    headers = {"User-Agent": "Mozilla/5.0 (compatible; AsyncScraper/1.0)"}
+
+    headers = {"User-Agent": "Mozilla/5.0"}
     backoff = 1.0
-    for attempt in range(1, MAX_RETRIES+1):
+
+    for _ in range(MAX_RETRIES):
         try:
             async with async_timeout.timeout(REQUEST_TIMEOUT):
-                async with session.get(url, params=params, headers=headers, proxy=proxy) as resp:
+                async with session.get(url, params=params, headers=headers) as resp:
                     if resp.status == 200:
-                        try:
-                            data = await resp.json(content_type=None)
-                        except:
-                            return None
+                        data = await resp.json(content_type=None)
                         fares = data.get("fares") or data.get("roundTripFares") or []
+
                         prices = []
                         for f in fares:
-                            try:
-                                outp = f.get("outbound", {}).get("price", {}).get("value")
-                                inp = f.get("inbound", {}).get("price", {}).get("value")
-                                if outp is not None and inp is not None:
-                                    prices.append(outp + inp)
-                            except:
-                                continue
+                            outp = f.get("outbound", {}).get("price", {}).get("value")
+                            inp = f.get("inbound", {}).get("price", {}).get("value")
+                            if outp and inp:
+                                prices.append(outp + inp)
+
                         if prices:
-                            return {"price": min(prices)}
+                            return min(prices)
                         return None
-                    elif resp.status in (429, 500, 502, 503, 521, 522):
-                        await asyncio.sleep(backoff)
-                        backoff *= BACKOFF_BASE
-                        continue
-                    else:
-                        return None
-        except asyncio.TimeoutError:
+
+        except:
             await asyncio.sleep(backoff)
             backoff *= BACKOFF_BASE
-            continue
-        except Exception:
-            await asyncio.sleep(backoff)
-            backoff *= BACKOFF_BASE
-            continue
+
     return None
 
-async def worker_task(sema, session, origin, dest, out_date, in_date, proxy=None):
+async def worker(sema, session, origin, dest, out_date, in_date):
     async with sema:
-        result = await fetch_farfnd(session, origin, dest, out_date, in_date, proxy)
-        if result:
-            link = make_link(origin, dest, out_date, in_date)
+        price = await fetch_farfnd(session, origin, dest, out_date, in_date)
+        if price:
             row = {
                 "origin_iata": origin,
-                "origin_city": ORIGINS.get(origin,""),
+                "origin_city": ORIGINS.get(origin, ""),
                 "destination_iata": dest,
-                "destination_city": DESTINATIONS.get(dest,""),
+                "destination_city": DESTINATIONS.get(dest, ""),
                 "outbound_date": out_date.isoformat(),
                 "inbound_date": in_date.isoformat(),
-                "total_price": result["price"],
-                "link": link
+                "total_price": price,
+                "link": make_link(origin, dest, out_date, in_date)
             }
             write_row_csv(row)
-            return row
-        return None
 
 async def main():
-
+    # CSV header
     with open(OUTPUT_CSV, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_HEADERS)
         writer.writeheader()
 
-    out_dates = list(daterange(START_DATE, END_DATE))
-    connector = aiohttp.TCPConnector(limit_per_host=CONCURRENCY)
+    sema = asyncio.Semaphore(CONCURRENCY)
 
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+
+        for origin, dest in product(ORIGINS.keys(), DESTINATIONS.keys()):
+            for out_date in daterange(START_DATE, END_DATE):
+                for trip_len in range(2, 6):  # np. 2–5 dni
+                    in_date = out_date + timedelta(days=trip_len)
+                    if in_date > END_DATE:
+                        continue
+
+                    tasks.append(
+                        worker(sema, session, origin, dest, out_date, in_date)
+                    )
+
+        await asyncio.gather(*tasks)
+
+# --- START ---
+if __name__ == "__main__":
+    t0 = time.time()
     asyncio.run(main())
     print("Koniec. Czas:", time.time() - t0, "s")
