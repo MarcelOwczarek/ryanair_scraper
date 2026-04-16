@@ -9,51 +9,14 @@ import time
 import csv
 import os
 
-START_DATE = date(2026, 4, 15)
-END_DATE = date(2026, 12, 31)
+# --- KONFIG ---
+START_DATE = date(2025, 11, 1)
+END_DATE = date(2025, 11, 30)
 
-
-
-ORIGINS = {
-    "LCJ": "Łódź",
-    "WMI": "Warszawa Modlin",
-    "WAW": "Warszawa Chopin",
-    "KTW": "Katowice",
-    "KRK": "Kraków",
-    "POZ": "Poznań"
-}
-
+ORIGINS = {"LCJ": "Łódź", "WMI": "Warszawa Modlin", "WAW": "Warszawa Chopin", "KTW": "Katowice"}
 DESTINATIONS = {
-    # Wielka Brytania
-    "STN": "London Stansted",
-    "LTN": "London Luton",
-    "EDI": "Edinburgh",
-    
-    # Hiszpania
-    "AGP": "Malaga",
-    "SVQ": "Sewilla",
-    "PMI": "Palma de Mallorca",
-    "TFS": "Teneryfa Południe",
-
-    # Włochy
-    "BGY": "Bergamo",
-    "FCO": "Rzym Fiumicino",
-    "CIA": "Rzym Ciampino",
-    "NAP": "Neapol",
-    
-    # Francja
-    "BVA": "Paryż Beauvais",
-    "NCE": "Nicea",
-    
-    # Grecja
-    "ATH": "Ateny",
-    "CHQ": "Chania",
-
-    # Chorwacja
-    "DBV": "Dubrownik",
-    
-    # Czarnogóra
-    "TGD": "Podgorica",  
+    "STN": "London Stansted", "EDI": "Edinburgh", "AGP": "Malaga", "ALC": "Alicante",
+    "CDG": "Paryż", "ATH": "Ateny", "BGY": "Bergamo", "OPO": "Porto"
 }
 
 ADULTS = 1
@@ -62,7 +25,7 @@ MARKET = "pl-pl"
 
 CONCURRENCY = 8
 REQUEST_TIMEOUT = 20
-MAX_RETRIES = 6
+MAX_RETRIES = 3
 BACKOFF_BASE = 1.5
 
 OUTPUT_CSV = 'ryanair_nov_full_async.csv'
@@ -173,22 +136,6 @@ async def main():
 
     out_dates = list(daterange(START_DATE, END_DATE))
     connector = aiohttp.TCPConnector(limit_per_host=CONCURRENCY)
-    timeout = aiohttp.ClientTimeout(total=REQUEST_TIMEOUT+5)
-    sema = asyncio.Semaphore(CONCURRENCY)
-    combos = [
-        (origin, dest, out_date, out_date + timedelta(days=delta))
-        for origin, dest in product(ORIGINS.keys(), DESTINATIONS.keys())
-        for out_date in out_dates
-        for delta in range(1,4)
-        if out_date + timedelta(days=delta) <= END_DATE
-    ]
-    print(f"Łącznie kombinacji do sprawdzenia: {len(combos)}")
 
-    async with aiohttp.ClientSession(connector=connector, timeout=timeout) as session:
-        tasks = [worker_task(sema, session, o, d, od, id) for o,d,od,id in combos]
-        for f in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="scraping"):
-            await f
-
-if __name__ == "__main__":
-    t0 = time.time()
     asyncio.run(main())
+    print("Koniec. Czas:", time.time() - t0, "s")
