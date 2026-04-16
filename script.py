@@ -23,21 +23,26 @@ ORIGINS = {
 }
 
 DESTINATIONS = {
+    
     "STN": "London Stansted",
     "LTN": "London Luton",
     "EDI": "Edinburgh",
+    
     "AGP": "Malaga",
     "SVQ": "Sewilla",
     "PMI": "Palma de Mallorca",
     "TFS": "Teneryfa Południe",
+    
     "BGY": "Bergamo",
     "FCO": "Rzym Fiumicino",
     "CIA": "Rzym Ciampino",
     "NAP": "Neapol",
+    
     "BVA": "Paryż Beauvais",
-    "ATH": "Ateny",
-    "CHQ": "Chania",
+    "NCE": "Nicea",
+    
     "DBV": "Dubrownik",
+    
     "TGD": "Podgorica",
 }
 
