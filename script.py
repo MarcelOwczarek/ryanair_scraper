@@ -10,8 +10,8 @@ import csv
 import os
 
 # --- KONFIG ---
-START_DATE = date(2026, 4, 16)
-END_DATE = date(2026, 12, 31)
+START_DATE = datetime.date(2026, 4, 16)
+END_DATE = datetime.date(2026, 12, 31)
 
 ORIGINS = {
     "LCJ": "Łódź",
